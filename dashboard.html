@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acme AI Referral Monitor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="ai_traffic_data.js"></script>
+<script src="geo_data.js"></script>
+<script src="adhoc_data.js"></script>
+<script src="analyst_data.js"></script>
+<script src="keyword_demand_data.js"></script>
+<style>
+:root{--bg:#f3f6f2;--card:#fff;--ink:#10271d;--text:#254135;--muted:#68786f;--line:#dfe7df;--green:#08783e;--lime:#c9ff55;--red:#c3423b;--amber:#a86200;--shadow:0 10px 30px rgba(22,53,38,.07)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 92% 0,#dff5df 0,transparent 28%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}.shell{max-width:1440px;margin:auto;padding:0 32px 60px}
+header{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d7e1d8;margin-bottom:30px}.brand{display:flex;align-items:center;gap:12px}.mark{width:39px;height:39px;border-radius:12px;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-weight:900;font-size:17px}.brand strong{display:block;color:var(--ink);font-size:15px}.brand span{display:block;color:var(--muted);font-size:11px}.header-actions{display:flex;align-items:center;gap:10px}.badge{padding:5px 9px;border-radius:999px;background:#e5f5e9;color:var(--green);font-size:11px;font-weight:800}.refresh{padding:8px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--green);font-weight:750;cursor:pointer}.refresh:hover{border-color:#9bcea8}.refresh:disabled{opacity:.55;cursor:wait}
+.nav{display:flex;gap:3px;background:#e7ece7;padding:4px;border-radius:12px}.nav button{border:0;background:transparent;color:var(--muted);padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:700}.nav button.active{background:#fff;color:var(--ink);box-shadow:0 2px 10px rgba(21,55,38,.08)}[data-tab][hidden]{display:none}
+.eyebrow{color:var(--green);font-size:11px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(310px,.5fr);gap:16px;margin-bottom:16px}.hero-main,.truth{border-radius:18px;padding:30px}.hero-main{background:var(--ink);color:#fff;box-shadow:0 18px 46px rgba(16,39,29,.16)}h1{font-size:38px;line-height:1.08;letter-spacing:-.045em;max-width:800px;margin:12px 0}.hero-main p{color:#c9d6cf;font-size:15px;max-width:800px;margin:0}.period{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.period button{border:1px solid rgba(255,255,255,.18);background:transparent;color:#bfcfc6;border-radius:8px;padding:6px 11px;cursor:pointer}.period button.active{background:var(--lime);border-color:var(--lime);color:var(--ink);font-weight:800}.truth{background:var(--lime);color:var(--ink);display:flex;flex-direction:column;justify-content:space-between}.truth strong{display:block;font-size:21px;line-height:1.2;margin-top:10px}.truth p{color:#3e542f;margin:18px 0 0}.truth a{color:inherit}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 28px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.kpi{padding:20px;min-height:142px;display:flex;flex-direction:column;justify-content:space-between}.label{color:#6f7e75;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}.value{font-size:35px;font-weight:850;line-height:1;letter-spacing:-.04em;color:var(--ink);margin:10px 0}.sub{color:var(--muted);font-size:12px}.up{color:var(--green)}.down{color:var(--red)}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:28px 0 12px}.section-head h2{margin:0;color:var(--ink);font-size:21px;letter-spacing:-.025em}.section-head p{margin:3px 0 0;color:var(--muted)}.filters{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.filters input{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;color:var(--text)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{padding:20px}.chart{height:300px;position:relative}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:11px 12px;border-bottom:1px solid #e8ede8;text-align:right;white-space:nowrap}th{background:#f7f9f6;color:#718078;font-size:10px;letter-spacing:.1em;text-transform:uppercase}th:first-child,td:first-child{text-align:left}tbody tr:hover td{background:#f8faf7}.engine{display:flex;align-items:center;gap:8px}.dot{width:9px;height:9px;border-radius:50%}.page{max-width:520px;overflow:hidden;text-overflow:ellipsis}.zero{color:#97a39c}.definition{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}.definition .card{padding:21px}.definition h3{font-size:15px;color:var(--ink);margin:7px 0}.definition ul{margin:8px 0 0;padding-left:18px;color:var(--muted)}.definition li{margin:5px 0}.measured{border-top:4px solid var(--green)}.missing{border-top:4px solid var(--amber)}
+.empty{padding:70px 20px;text-align:center}.empty h2{color:var(--ink)}footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:30px;padding-top:18px}.status{font-size:11px;color:var(--muted)}
+.probe-hero{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-bottom:16px}.probe-summary{padding:28px;background:var(--ink);color:#fff}.probe-summary h1{font-size:34px}.probe-summary p{color:#c8d5ce}.method{padding:25px;background:#fff}.method strong{font-size:18px;color:var(--ink);display:block;margin:8px 0}.matrix td,.matrix th{text-align:center}.matrix td:first-child,.matrix th:first-child{text-align:left}.hit{color:var(--green);font-weight:800}.miss{color:#909d95}.warn{color:var(--amber)}.source-list{display:flex;gap:7px;flex-wrap:wrap}.source-chip{padding:5px 8px;border-radius:8px;background:#eef3ee;color:#43564a;font-size:12px}.note{padding:13px 15px;border-radius:12px;background:#fff8e7;border:1px solid #ead8ad;color:#66501f;margin:14px 0}.scope{color:var(--muted);font-size:12px;margin-top:8px}
+.gap-intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:22px 24px;margin-bottom:14px;border-left:5px solid var(--amber)}.gap-intro strong{display:block;color:var(--ink);font-size:20px;line-height:1.25}.gap-intro p{margin:5px 0 0;color:var(--muted)}.gap-intro .big{font-size:32px;font-weight:850;color:var(--ink);text-align:right}.gap-intro .big span{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}.gap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.gap-card{padding:21px 22px}.gap-top{display:flex;justify-content:space-between;align-items:start;gap:12px}.gap-name{color:var(--ink);font-size:19px;font-weight:850}.gap-rank{padding:4px 8px;border-radius:8px;background:#fff1dc;color:#8a5100;font-size:11px;font-weight:800}.compare{margin:16px 0}.compare-row{display:grid;grid-template-columns:76px 1fr 47px;gap:9px;align-items:center;margin:8px 0;font-size:12px}.track{height:8px;background:#edf1ed;border-radius:99px;overflow:hidden}.fill{height:100%;border-radius:99px;background:#819087}.fill.acme{background:var(--green)}.gap-fact{padding:12px 13px;background:#f6f8f5;border-radius:10px;margin:12px 0}.gap-fact b{display:block;color:var(--ink);font-size:13px}.gap-fact span{display:block;color:var(--muted);font-size:12px;margin-top:2px}.source-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.source-chips span{background:#edf2ed;color:#45584c;border-radius:7px;padding:4px 7px;font-size:11px}.next-step{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);color:var(--text);font-size:13px}.next-step b{color:var(--green)}
+.diagnostic{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.diagnostic summary{cursor:pointer;color:var(--green);font-weight:800;font-size:12px}.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}.diag-title{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.diag-list{margin:7px 0 0;padding-left:18px;color:var(--text);font-size:12px}.diag-list li{margin:6px 0}.model-bars{margin-top:7px}.model-line{display:grid;grid-template-columns:75px 1fr 25px;gap:7px;align-items:center;font-size:11px;margin:6px 0}.evidence{margin-top:12px;padding:11px;border-radius:9px;background:#f6f8f5;color:var(--muted);font-size:12px;font-style:italic}
+.absence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:13px 0}.absence-card{padding:18px}.absence-card .value{font-size:30px}.absence-card.competitor{border-top:4px solid #c07a10}.absence-card.open{border-top:4px solid #7c8c82}.absence-card.citation{border-top:4px solid #3b82a0}.plan-list{display:grid;gap:10px}.plan-item{display:grid;grid-template-columns:52px minmax(220px,1.3fr) minmax(190px,.8fr) minmax(260px,1fr);gap:15px;align-items:center;padding:16px 18px}.priority{width:42px;height:42px;border-radius:12px;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-weight:900}.plan-query{font-weight:800;color:var(--ink)}.plan-query span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:3px}.plan-signal{font-size:12px;color:var(--muted)}.plan-signal b{display:block;color:var(--text);font-size:13px}.plan-action{font-size:12px;color:var(--text);padding-left:14px;border-left:3px solid var(--green)}.plan-action b{display:block;color:var(--green);margin-bottom:2px}.strategy{display:inline-block;padding:3px 7px;border-radius:7px;background:#e8f3ea;color:var(--green);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.ask-box{margin-top:30px;padding:26px;background:var(--ink);color:#fff}.ask-box h2{margin:6px 0;font-size:25px}.ask-box>p{color:#c5d2ca;margin:0 0 18px}.ask-form{display:flex;gap:9px}.ask-form input{flex:1;border:1px solid #4a6356;border-radius:10px;background:#fff;color:var(--ink);padding:12px 14px}.ask-form button{border:0;border-radius:10px;background:var(--lime);color:var(--ink);font-weight:850;padding:11px 18px;cursor:pointer}.ask-status{color:#bdc9c2;font-size:12px;margin-top:9px}.answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}.answer{background:#fff;color:var(--text);border-radius:13px;padding:17px}.answer-head{display:flex;justify-content:space-between;gap:8px;align-items:start}.answer h3{margin:0;color:var(--ink);font-size:16px}.answer-text{white-space:pre-wrap;max-height:280px;overflow:auto;font-size:12px;margin:13px 0}.answer details summary{cursor:pointer;color:var(--green);font-size:12px;font-weight:800}.answer a{display:block;color:var(--green);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:5px}.answer-flag{font-size:10px;font-weight:800;border-radius:7px;padding:4px 6px;background:#edf2ed}.answer-flag.yes{background:#e3f5e7;color:var(--green)}
+.analyst-box{position:fixed;right:24px;bottom:24px;z-index:800;width:min(460px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));overflow:auto;padding:22px;box-shadow:0 28px 80px rgba(6,30,18,.28)}.analyst-box[hidden]{display:none}.analyst-head{display:flex;justify-content:space-between;align-items:start;gap:12px}.analyst-box h2{margin:5px 0;color:var(--ink);font-size:22px}.analyst-close{border:0;background:#edf2ed;color:var(--ink);border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:900;flex:0 0 auto}.analyst-fab{position:fixed;right:24px;bottom:24px;z-index:799;border:0;border-radius:999px;background:var(--ink);color:#fff;padding:14px 19px;box-shadow:0 14px 40px rgba(6,30,18,.3);font-weight:850;cursor:pointer;display:flex;align-items:center;gap:9px}.analyst-fab:before{content:'✦';display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--lime);color:var(--ink)}.analyst-fab[hidden]{display:none}.analyst-answer{margin-top:16px;padding:17px;border-radius:13px;background:#f4f7f3;white-space:pre-wrap;color:var(--text);max-height:330px;overflow:auto}.analyst-sources{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.analyst-sources a{color:var(--green);background:#e6f1e8;border-radius:8px;padding:5px 8px;text-decoration:none;font-size:11px}.analyst-hints{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.analyst-hints button{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--green);padding:6px 9px;cursor:pointer;font-size:11px}.analyst-box .ask-form{position:sticky;bottom:-22px;background:#fff;padding:12px 0 22px;margin-bottom:-22px}.analyst-box .ask-form input{background:#f7f9f6}
+.demand-callout{padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}.demand-callout strong{font-size:17px;color:var(--ink)}.demand-callout p{margin:3px 0 0;color:var(--muted)}
+.refresh-lock{position:fixed;inset:0;z-index:9999;background:rgba(10,28,20,.96);color:#fff;display:grid;place-items:center;padding:24px;backdrop-filter:blur(8px)}.refresh-lock[hidden]{display:none}.refresh-modal{width:min(620px,100%);background:#163528;border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.4)}.refresh-modal h2{font-size:28px;margin:8px 0;color:#fff}.refresh-modal>p{color:#bfcec5;margin:0 0 22px}.refresh-progress{height:10px;background:#29493a;border-radius:99px;overflow:hidden;margin:18px 0}.refresh-progress i{display:block;width:4%;height:100%;background:var(--lime);border-radius:99px;transition:width .5s ease}.refresh-steps{display:grid;gap:9px}.refresh-step{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:9px;padding:11px 12px;background:rgba(255,255,255,.055);border-radius:10px;color:#b9c8bf}.refresh-step .step-icon{width:19px;height:19px;border-radius:50%;border:2px solid #688174;display:grid;place-items:center;font-size:10px}.refresh-step.running{color:#fff}.refresh-step.running .step-icon{border-color:var(--lime);animation:pulse 1.2s infinite}.refresh-step.done{color:#d7ff81}.refresh-step.done .step-icon{border-color:var(--lime);background:var(--lime);color:var(--ink)}.refresh-meta{display:flex;justify-content:space-between;gap:15px;margin-top:18px;color:#8fa499;font-size:12px}.refresh-warning{margin-top:14px;color:#e5c988;font-size:12px}@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(201,255,85,.15)}}
+@media(max-width:900px){.shell{padding:0 18px 40px}.hero,.probe-hero,.grid2,.definition,.gap-grid,.answers,.absence-grid{grid-template-columns:1fr}.plan-item{grid-template-columns:48px 1fr}.plan-signal,.plan-action{grid-column:2}.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:30px}.nav{order:3;width:100%;overflow:auto}header{flex-wrap:wrap;height:auto;padding:14px 0}.ask-form{flex-direction:column}}
+@media(max-width:560px){header{height:auto;padding:15px 0;align-items:flex-start}.header-actions{flex-direction:column;align-items:flex-end}.kpis{grid-template-columns:1fr}.hero-main,.truth{padding:23px}.section-head{align-items:flex-start;flex-direction:column}.chart{height:250px}.analyst-box{right:10px;bottom:10px;width:calc(100vw - 20px);max-height:calc(100vh - 20px)}.analyst-fab{right:14px;bottom:14px}.analyst-hints{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div class="brand"><div class="mark">AI</div><div><strong>Acme AI Monitor</strong><span>Independent model tests + verified GA4 outcomes</span></div></div>
+  <nav class="nav" id="nav"><button data-target="overview" class="active">Overview</button><button data-target="traffic">Traffic &amp; leads</button><button data-target="probes">Model tests</button></nav>
+  <div class="header-actions"><span class="badge" id="live-badge">CHECKING DATA</span><button class="refresh" id="refresh">↻ Refresh overview</button><span class="status" id="refresh-status"></span></div>
+</header>
+
+<main id="app" hidden>
+  <section data-tab id="overview">
+    <div class="probe-hero">
+      <div class="card probe-summary"><div class="eyebrow">Independent model measurement</div><h1 id="geo-headline">Loading direct model tests…</h1><p id="geo-headline-note"></p></div>
+      <div class="card method"><div class="label">How this is measured</div><strong>We ask the models directly.</strong><p class="sub" id="geo-method"></p><div class="source-list" id="geo-engines"></div></div>
+    </div>
+    <div class="note"><strong>Interpretation:</strong> these figures describe our fixed prompt panel and API/search configurations. They are repeatable monitoring signals, not market-wide consumer share.</div>
+    <section class="kpis">
+      <div class="card kpi"><div class="label">Neutral visibility</div><div class="value" id="geo-neutral">—</div><div class="sub">Acme named without prompting the brand</div></div>
+      <div class="card kpi"><div class="label">Branded visibility</div><div class="value" id="geo-branded">—</div><div class="sub">Questions that explicitly mention Acme</div></div>
+      <div class="card kpi"><div class="label">Neutral competitive rank</div><div class="value" id="geo-rank">—</div><div class="sub" id="geo-rank-sub"></div></div>
+      <div class="card kpi"><div class="label">Own-domain citation rate</div><div class="value" id="geo-cited">—</div><div class="sub">Neutral answers citing an Acme domain</div></div>
+    </section>
+    <div class="section-head"><div><h2>Neutral-prompt competitive position</h2><p>Calculated only from answers where the prompt does not contain “Acme”.</p></div></div>
+    <section class="card table-wrap"><table><thead><tr><th>#</th><th>Brand</th><th>Visible in answers</th><th>Share of tracked mentions</th><th>Average mention position</th></tr></thead><tbody id="geo-brand-body"></tbody></table></section>
+    <div class="section-head"><div><h2>What happens in the answers where Acme is absent?</h2><p>The missing 91% is split into different problems. Each one requires a different response.</p></div></div>
+    <div class="absence-grid">
+      <div class="card absence-card competitor"><div class="label">Competitor captured the answer</div><div class="value" id="abs-competitor">—</div><div class="sub" id="abs-competitor-note"></div></div>
+      <div class="card absence-card open"><div class="label">No tracked brand was named</div><div class="value" id="abs-open">—</div><div class="sub">Open category space: improve the direct answer, not just comparison pages.</div></div>
+      <div class="card absence-card citation"><div class="label">Acme source used, brand omitted</div><div class="value" id="abs-citation">—</div><div class="sub">The content is useful, but its connection to Acme is too weak.</div></div>
+    </div>
+    <div class="section-head"><div><h2>Recommended action queue</h2><p>Highest-impact missed questions, prioritised by frequency and commercial intent.</p></div></div>
+    <div class="plan-list" id="geo-plan"></div>
+    <div class="section-head"><div><h2>What Italians actually search for</h2><p>Google monthly search demand, used to choose which questions deserve model testing first.</p></div></div>
+    <section class="card demand-callout"><div><strong id="demand-summary">Run the demand refresh to load real search volumes.</strong><p id="demand-note">This is a search-demand proxy; chatbot providers do not publish prompt volumes.</p></div><div class="big" id="demand-date"></div></section>
+    <section class="card table-wrap"><table><thead><tr><th>Search query</th><th>Avg. monthly searches</th><th>Ads competition</th><th>Question-like</th></tr></thead><tbody id="demand-body"><tr><td colspan="4">No demand data yet.</td></tr></tbody></table></section>
+    <div class="section-head"><div><h2>Why are competitors ahead?</h2><p>Evidence from answers where a competitor appears and Acme does not.</p></div></div>
+    <section class="card gap-intro"><div><strong id="geo-gap-summary">Loading the competitive gap…</strong><p>We count answers where a competitor is recommended but Acme is missing, then group those misses by topic, question and cited source.</p></div><div class="big" id="geo-gap-total">—<span>missed answers</span></div></section>
+    <div class="gap-grid" id="geo-gap-body"></div>
+    <p class="scope">A “missed answer” means the competitor was named while Acme was absent. Repeated sources show where to investigate; they do not prove that a source caused the model's choice.</p>
+    <div class="section-head"><div><h2>Measurable business outcome</h2><p>GA4 independently shows what identifiable AI referrals produced on the website.</p></div></div>
+    <section class="kpis">
+      <div class="card kpi"><div class="label">AI referral visits · 28d</div><div class="value" id="ov-visits">—</div><div class="sub" id="ov-visits-sub"></div></div>
+      <div class="card kpi"><div class="label">GA4 lead events · 28d</div><div class="value" id="ov-leads">—</div><div class="sub" id="ov-leads-sub"></div></div>
+      <div class="card kpi"><div class="label">Event conversion rate</div><div class="value" id="ov-cr">—</div><div class="sub">slider-success events ÷ AI visits</div></div>
+      <div class="card kpi"><div class="label">Largest referral source</div><div class="value" id="ov-engine">—</div><div class="sub" id="ov-engine-sub"></div></div>
+    </section>
+    <section class="card ask-box">
+      <div class="eyebrow">Ask the models live</div><h2>Test any customer question</h2>
+      <p>Ask ChatGPT, Claude and Gemini once each. We show their full answers, whether Acme appears, competitors mentioned and cited sources.</p>
+      <form class="ask-form" id="ask-form"><input id="ask-input" placeholder="e.g. Quale azienda scegliere per fotovoltaico e accumulo?" maxlength="500" required><button id="ask-submit" type="submit">Ask all models</button></form>
+      <div class="ask-status" id="ask-status"></div><div class="answers" id="ask-answers"></div>
+    </section>
+    <section class="card analyst-box" id="analyst-box" hidden>
+      <div class="analyst-head"><div><div class="eyebrow">Claude dashboard analyst</div><h2>Ask about the data, Acme or competitors</h2></div><button class="analyst-close" id="analyst-close" type="button" aria-label="Close Claude analyst">×</button></div>
+      <p class="sub">Claude reads the latest dashboard snapshot. When needed, it searches Acme and competitor sites and returns the web sources it used.</p>
+      <div class="analyst-hints"><button type="button">Why is Enel ahead and what should Acme change?</button><button type="button">Compare Acme and Otovo's answers about no-upfront solar</button><button type="button">Which missed question has the biggest commercial opportunity?</button></div>
+      <form class="ask-form" id="analyst-form"><input id="analyst-input" placeholder="Ask Claude to analyse the dashboard or research a competitor…" maxlength="700" required><button id="analyst-submit" type="submit">Ask Claude</button></form>
+      <div class="ask-status" id="analyst-status"></div><div id="analyst-result"></div>
+    </section>
+    <button class="analyst-fab" id="analyst-fab" type="button">Ask Claude</button>
+  </section>
+
+  <section data-tab id="traffic" hidden>
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">What we can prove</div>
+      <h1 id="headline">AI referrals are sending measurable traffic to Acme.</h1>
+      <p id="headline-note"></p>
+      <div class="period" id="presets">
+        <button data-days="28" class="active">Last 28 days</button><button data-days="84">12 weeks</button><button data-days="182">26 weeks</button><button data-days="365">1 year</button>
+      </div>
+    </div>
+    <aside class="truth">
+      <div><div class="eyebrow">Measurement boundary</div><strong>This is a verified lower bound, not total “AI influence”.</strong></div>
+      <p>GA4 sees identifiable referrals such as ChatGPT and Perplexity. Google AI Overviews arrive as Google organic, and some apps remove the referrer.</p>
+    </aside>
+  </section>
+
+  <section class="kpis">
+    <div class="card kpi"><div class="label">AI referral visits</div><div class="value" id="visits">—</div><div class="sub" id="visits-sub"></div></div>
+    <div class="card kpi"><div class="label">GA4 lead events</div><div class="value" id="leads">—</div><div class="sub" id="leads-sub"></div></div>
+    <div class="card kpi"><div class="label">Event conversion rate</div><div class="value" id="cr">—</div><div class="sub">slider-success events ÷ AI visits</div></div>
+    <div class="card kpi"><div class="label">Largest source</div><div class="value" id="top-engine">—</div><div class="sub" id="top-engine-sub"></div></div>
+  </section>
+
+  <div class="section-head"><div><h2>Trend</h2><p>Identifiable AI referral visits and lead events within the selected period.</p></div><div class="filters"><input type="date" id="start"><span>→</span><input type="date" id="end"></div></div>
+  <section class="grid2">
+    <div class="card panel"><div class="label">Visits by week and source</div><div class="chart"><canvas id="visits-chart"></canvas></div></div>
+    <div class="card panel"><div class="label">Visits and GA4 lead events</div><div class="chart"><canvas id="outcome-chart"></canvas></div></div>
+  </section>
+
+  <div class="section-head"><div><h2>Which AI sources produce demand?</h2><p>Traffic source is taken from GA4 sessionSource. Lead means a recorded slider-success event.</p></div></div>
+  <section class="card table-wrap"><table><thead><tr><th>Source</th><th>Visits</th><th>GA4 lead events</th><th>Event CR</th><th>Share of AI visits</th></tr></thead><tbody id="engine-body"></tbody></table></section>
+
+  <div class="section-head"><div><h2>Where do visitors land?</h2><p>Top Acme pages entered directly from identifiable AI referrals.</p></div></div>
+  <section class="card table-wrap"><table><thead><tr><th>Landing page</th><th>Source</th><th>Visits</th><th>GA4 lead events</th></tr></thead><tbody id="landing-body"></tbody></table></section>
+
+  <section class="definition">
+    <div class="card measured"><div class="label">Included · directly measured</div><h3>Observable AI referral traffic</h3><ul><li>Sessions whose GA4 source identifies an AI service</li><li>Slider-success events attributed to those sessions</li><li>Engine and landing-page breakdowns from GA4</li></ul></div>
+    <div class="card missing"><div class="label">Excluded · cannot be separated reliably</div><h3>AI-influenced traffic outside the referrer</h3><ul><li>Google AI Overviews and AI Mode, recorded as Google organic</li><li>Chatbot apps or copied links that strip referral data</li><li>Users who later return through Direct or brand search</li></ul></div>
+  </section>
+  </section>
+
+  <section data-tab id="probes" hidden>
+    <div class="section-head"><div><h2>Direct model tests</h2><p id="probe-meta">Each cell shows how often Acme appeared across repeated answers.</p></div></div>
+    <div class="note">This monitor uses model APIs with web search where available. Consumer apps may differ because of personalization, location, account state and changing system prompts.</div>
+    <section class="card table-wrap matrix"><table><thead id="probe-matrix-head"></thead><tbody id="probe-matrix-body"></tbody></table></section>
+    <div class="section-head"><div><h2>Visibility by model</h2><p>Neutral prompts only, so the brand name is not supplied in the question.</p></div></div>
+    <section class="card table-wrap"><table><thead><tr><th>Model test</th><th>Answers tested</th><th>Acme present</th><th>Visibility</th><th>Avg position</th><th>Own-domain citation</th></tr></thead><tbody id="probe-engine-body"></tbody></table></section>
+    <div class="section-head"><div><h2>Most-used sources</h2><p>Domains returned as citations in the latest direct test run.</p></div></div>
+    <section class="card table-wrap"><table><thead><tr><th>Domain</th><th>Citations</th><th>Share</th></tr></thead><tbody id="probe-source-body"></tbody></table></section>
+  </section>
+</main>
+
+<section id="empty" class="card empty" hidden><h2>No live GA4 data found</h2><p>Run <code>python ga4_ai_traffic.py</code>, then reopen this dashboard.</p></section>
+<footer id="footer"></footer>
+</div>
+<div class="refresh-lock" id="refresh-lock" hidden aria-live="polite">
+  <div class="refresh-modal">
+    <div class="eyebrow" style="color:var(--lime)">Refreshing source data</div>
+    <h2 id="refresh-title">This page is being refreshed</h2>
+    <p id="refresh-explain">Keep this tab open; it will reload automatically when the page has fresh data.</p>
+    <div class="refresh-progress"><i id="refresh-progress-bar"></i></div>
+    <div class="refresh-steps">
+      <div class="refresh-step" id="refresh-step-ga4"><span class="step-icon">1</span><b>GA4 traffic &amp; lead events</b><span>Waiting</span></div>
+      <div class="refresh-step" id="refresh-step-demand"><span class="step-icon">2</span><b>Google search demand</b><span>Waiting</span></div>
+      <div class="refresh-step" id="refresh-step-geo"><span class="step-icon">3</span><b>ChatGPT, Claude &amp; Gemini tests</b><span>Waiting</span></div>
+    </div>
+    <div class="refresh-meta"><span id="refresh-elapsed">Elapsed 00:00</span><span id="refresh-count">0 of 3 completed</span></div>
+    <div class="refresh-warning" id="refresh-warning">This quick refresh tests every question once. The three-sample deep benchmark remains available from the command line.</div>
+  </div>
+</div>
+<script>
+(() => {
+  const D = window.GA4_LIVE_DATA;
+  const G = window.GEO_LIVE_DATA;
+  const K = window.KEYWORD_DEMAND_DATA;
+  const $ = id => document.getElementById(id);
+  // Move the analyst out of the tab container so it stays visible across tabs.
+  document.body.append($('analyst-box'),$('analyst-fab'));
+  const openAnalyst=()=>{$('analyst-box').hidden=false;$('analyst-fab').hidden=true;setTimeout(()=>$('analyst-input').focus(),0)};
+  const closeAnalyst=()=>{$('analyst-box').hidden=true;$('analyst-fab').hidden=false};
+  $('analyst-fab').addEventListener('click',openAnalyst);$('analyst-close').addEventListener('click',closeAnalyst);
+  if (!D || !Array.isArray(D.daily)) { $('empty').hidden=false; $('live-badge').textContent='NO DATA'; return; }
+  $('app').hidden=false; $('live-badge').textContent='LIVE · OWN DATA';
+  const colors={openai:'#10a37f',gemini:'#4285f4',perplexity:'#20a4b7',claude:'#d97757',copilot:'#f2a900',meta_ai:'#0866ff',mistral:'#ff7000',grok:'#555',deepseek:'#5d65d8',you_com:'#da3d83',poe:'#9568d8'};
+  const names={openai:'ChatGPT / OpenAI',gemini:'Gemini',perplexity:'Perplexity',anthropic:'Claude',claude:'Claude',copilot:'Microsoft Copilot',meta_ai:'Meta AI',mistral:'Mistral',grok:'Grok',deepseek:'DeepSeek',you_com:'You.com',poe:'Poe'};
+  const ai=D.daily.filter(r=>r.engine!=='non_ai');
+  const dates=ai.map(r=>r.date).sort(); const min=dates[0], max=dates[dates.length-1];
+  $('start').min=min; $('start').max=max; $('end').min=min; $('end').max=max;
+  const shift=(iso,n)=>{const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+  const fmt=n=>(+n||0).toLocaleString('en-US'); const pct=x=>isFinite(x)?(100*x).toFixed(x<.01?2:1)+'%':'—';
+  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let range={start:shift(max,-27)<min?min:shift(max,-27),end:max}; let charts=[];
+  $('start').value=range.start;$('end').value=range.end;
+  function rowsBetween(rows,s,e){return rows.filter(r=>r.date>=s&&r.date<=e)}
+  function totals(rows){return rows.reduce((a,r)=>{a.sessions+=r.sessions||0;a.leads+=(r.leads??r.conversions??0);return a},{sessions:0,leads:0})}
+  function delta(cur,prev){if(!prev)return null;return 100*(cur-prev)/prev}
+  function deltaText(cur,prev,label){const d=delta(cur,prev);if(d===null)return `${label} · no comparable prior volume`;return `<span class="${d>=0?'up':'down'}">${d>=0?'+':''}${Math.round(d)}%</span> vs previous period`}
+  function monday(iso){const d=new Date(iso+'T00:00:00Z'),day=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()-day+1);return d.toISOString().slice(0,10)}
+  function aggregateByEngine(rows){const m={};for(const r of rows){const x=m[r.engine]||(m[r.engine]={engine:r.engine,sessions:0,leads:0});x.sessions+=r.sessions||0;x.leads+=(r.leads??r.conversions??0)}return Object.values(m).sort((a,b)=>b.sessions-a.sessions)}
+  function render(){
+    const curRows=rowsBetween(ai,range.start,range.end);const days=Math.round((new Date(range.end)-new Date(range.start))/86400000)+1;
+    const prevEnd=shift(range.start,-1),prevStart=shift(prevEnd,-days+1);const prevRows=rowsBetween(ai,prevStart,prevEnd);
+    const cur=totals(curRows),prev=totals(prevRows),eng=aggregateByEngine(curRows),top=eng[0];
+    $('visits').textContent=fmt(cur.sessions);$('visits-sub').innerHTML=deltaText(cur.sessions,prev.sessions,`${days} days`);
+    $('leads').textContent=fmt(cur.leads);$('leads-sub').innerHTML=deltaText(cur.leads,prev.leads,`${days} days`)+' · event count';
+    $('cr').textContent=cur.sessions?pct(cur.leads/cur.sessions):'—';$('top-engine').textContent=top?(names[top.engine]||top.engine):'—';$('top-engine-sub').textContent=top?`${fmt(top.sessions)} visits · ${pct(top.sessions/cur.sessions)} of measured AI traffic`:'No traffic';
+    const vDelta=delta(cur.sessions,prev.sessions),lDelta=cur.leads-prev.leads;
+    $('headline').textContent=cur.sessions?`${fmt(cur.sessions)} measurable AI visits produced ${fmt(cur.leads)} GA4 lead events.`:'No measurable AI referral traffic in this period.';
+    $('headline-note').textContent=`Selected period: ${range.start} to ${range.end}. ${vDelta===null?'No prior comparison available.':`Visits ${vDelta>=0?'increased':'decreased'} ${Math.abs(Math.round(vDelta))}% and lead events changed by ${lDelta>=0?'+':''}${lDelta} versus the previous ${days} days.`}`;
+    $('engine-body').innerHTML=eng.length?eng.map(r=>`<tr><td><span class="engine"><i class="dot" style="background:${colors[r.engine]||'#7b887f'}"></i>${names[r.engine]||r.engine}</span></td><td>${fmt(r.sessions)}</td><td class="${r.leads?'':'zero'}">${fmt(r.leads)}</td><td>${r.sessions?pct(r.leads/r.sessions):'—'}</td><td>${cur.sessions?pct(r.sessions/cur.sessions):'—'}</td></tr>`).join(''):'<tr><td colspan="5">No AI referral traffic in this period.</td></tr>';
+    const ld=rowsBetween(D.landing_daily||[],range.start,range.end),lm={};for(const r of ld){const k=r.engine+'|'+r.page,x=lm[k]||(lm[k]={engine:r.engine,page:r.page,sessions:0,leads:0});x.sessions+=r.sessions||0;x.leads+=r.leads||0}
+    const lands=Object.values(lm).sort((a,b)=>b.sessions-a.sessions).slice(0,15);$('landing-body').innerHTML=lands.length?lands.map(r=>`<tr><td class="page" title="${r.page}">${r.page}</td><td>${names[r.engine]||r.engine}</td><td>${fmt(r.sessions)}</td><td class="${r.leads?'':'zero'}">${fmt(r.leads)}</td></tr>`).join(''):'<tr><td colspan="4">No landing-page data in this period.</td></tr>';
+    renderCharts(curRows);
+  }
+  function renderOverviewTraffic(){
+    const s=shift(max,-27)<min?min:shift(max,-27),e=max,ps=shift(s,-28),pe=shift(s,-1);
+    const cur=totals(rowsBetween(ai,s,e)),prev=totals(rowsBetween(ai,ps,pe)),eng=aggregateByEngine(rowsBetween(ai,s,e)),top=eng[0];
+    $('ov-visits').textContent=fmt(cur.sessions);$('ov-visits-sub').innerHTML=deltaText(cur.sessions,prev.sessions,'28 days');
+    $('ov-leads').textContent=fmt(cur.leads);$('ov-leads-sub').innerHTML=deltaText(cur.leads,prev.leads,'28 days')+' · event count';
+    $('ov-cr').textContent=cur.sessions?pct(cur.leads/cur.sessions):'—';$('ov-engine').textContent=top?(names[top.engine]||top.engine):'—';
+    $('ov-engine-sub').textContent=top?`${fmt(top.sessions)} visits · ${pct(top.sessions/cur.sessions)} of measured traffic`:'No traffic';
+  }
+  function renderGeo(){
+    if(!G||!Array.isArray(G.runs)||!G.runs.length){$('geo-headline').textContent='No direct model run is available yet.';$('geo-headline-note').textContent='Run geo_monitor.py to generate independent visibility data.';return}
+    const run=G.runs[G.runs.length-1],rows=(run.results||[]).filter(r=>!r.error),neutral=rows.filter(r=>r.type==='non_branded'),branded=rows.filter(r=>r.type==='branded');
+    const engines=[...new Set(rows.map(r=>r.engine))],queries=[...new Set(rows.map(r=>r.query))];
+    const sum=(list,key)=>list.reduce((a,r)=>a+(r[key]||0),0),nRuns=sum(neutral,'runs'),nHits=sum(neutral,'appeared'),bRuns=sum(branded,'runs'),bHits=sum(branded,'appeared');
+    const samples=neutral.flatMap(r=>r.samples||[]),brandMap={};
+    for(const sample of samples){const seen=new Set();for(const [i,b] of (sample.brands||[]).entries()){if(seen.has(b))continue;seen.add(b);const x=brandMap[b]||(brandMap[b]={brand:b,hits:0,points:0,positions:[]});x.hits++;x.points+=i===0?3:1;x.positions.push(i+1)}}
+    const brands=Object.values(brandMap),allPoints=brands.reduce((a,b)=>a+b.points,0);brands.sort((a,b)=>b.hits-a.hits||b.points-a.points);const ownIndex=brands.findIndex(b=>b.brand==='Acme'),own=brands[ownIndex];
+    const ownCites=samples.filter(s=>s.cited).length,totalCites=samples.length;
+    const missed=samples.filter(s=>!(s.brands||[]).includes('Acme'));
+    const competitorMiss=missed.filter(s=>(s.brands||[]).length>0),openMiss=missed.filter(s=>(s.brands||[]).length===0),citationMiss=missed.filter(s=>s.cited);
+    $('geo-neutral').textContent=nRuns?pct(nHits/nRuns):'—';$('geo-branded').textContent=bRuns?pct(bHits/bRuns):'—';$('geo-rank').textContent=ownIndex>=0?`#${ownIndex+1}`:'—';
+    $('geo-rank-sub').textContent=`among ${brands.length} tracked brands · neutral answers only`;$('geo-cited').textContent=totalCites?pct(ownCites/totalCites):'—';
+    $('geo-headline').textContent=nRuns?`Acme appeared in ${fmt(nHits)} of ${fmt(nRuns)} neutral test answers.`:'No successful neutral test answers.';
+    $('geo-headline-note').textContent=`Latest run: ${run.date||G.generated_at?.slice(0,10)||'—'}. Branded prompts are reported separately and never used to calculate the neutral competitive rank.`;
+    const sampleDepth=Math.max(0,...rows.map(r=>r.runs||0));$('geo-method').textContent=`${queries.length} fixed questions × ${engines.length} available model providers × ${sampleDepth||'available'} sample${sampleDepth===1?'':'s'} per question. Latest run contains ${rows.reduce((a,r)=>a+(r.runs||0),0)} successful answers.`;
+    $('geo-engines').innerHTML=engines.map(e=>`<span class="source-chip">${esc(names[e]||e)}</span>`).join('');
+    $('geo-brand-body').innerHTML=brands.slice(0,15).map((b,i)=>`<tr${b.brand==='Acme'?' class="hit"':''}><td>${i+1}</td><td>${esc(b.brand)}${b.brand==='Acme'?' ★':''}</td><td>${samples.length?pct(b.hits/samples.length):'—'}</td><td>${allPoints?pct(b.points/allPoints):'—'}</td><td>${b.positions.length?(b.positions.reduce((a,x)=>a+x,0)/b.positions.length).toFixed(1):'—'}</td></tr>`).join('');
+    $('abs-competitor').textContent=missed.length?pct(competitorMiss.length/missed.length):'—';
+    const missBrands={};for(const s of competitorMiss)for(const b of new Set(s.brands||[]))missBrands[b]=(missBrands[b]||0)+1;const leadMiss=Object.entries(missBrands).sort((a,b)=>b[1]-a[1])[0];
+    $('abs-competitor-note').textContent=leadMiss?`${leadMiss[0]} is the most frequent winner (${leadMiss[1]} missed answers).`:'No competitor captured these answers.';
+    $('abs-open').textContent=missed.length?pct(openMiss.length/missed.length):'—';$('abs-citation').textContent=missed.length?pct(citationMiss.length/missed.length):'—';
+    const intentWeight={awareness:1,consideration:2,decision:3};
+    const opportunities=neutral.map(r=>{const ss=r.samples||[],miss=ss.filter(s=>!(s.brands||[]).includes('Acme')),comp=miss.filter(s=>(s.brands||[]).length),open=miss.filter(s=>!(s.brands||[]).length),cited=miss.filter(s=>s.cited),brandCounts={},domainCounts={};for(const s of miss){for(const b of new Set(s.brands||[]))brandCounts[b]=(brandCounts[b]||0)+1;for(const d of new Set(s.domains||[]))domainCounts[d]=(domainCounts[d]||0)+1}const topBrand=Object.entries(brandCounts).sort((a,b)=>b[1]-a[1])[0],topDomain=Object.entries(domainCounts).filter(([d])=>!/(^|\.)acme\.(com|it|de)$/i.test(d)).sort((a,b)=>b[1]-a[1])[0];return{query:r.query,topic:r.topic||'other',funnel:r.funnel||'awareness',runs:ss.length,miss:miss.length,comp:comp.length,open:open.length,cited:cited.length,topBrand,topDomain,score:miss.length*(intentWeight[r.funnel]||1)}}).filter(x=>x.miss).sort((a,b)=>b.score-a.score||b.miss-a.miss).slice(0,6);
+    $('geo-plan').innerHTML=opportunities.map((o,i)=>{let strategy,action;if(o.cited/o.miss>=.35){strategy='Entity & messaging';action=`The model uses Acme content but omits the brand. Add a concise “Acme solution” answer, explicit company/product naming and a quotable summary to the relevant ${o.topic.replaceAll('_',' ')} page.`}else if(o.comp/o.miss>=.5){strategy='Comparison & authority';action=`${o.topBrand?.[0]||'A competitor'} owns this question. Publish a direct, evidence-based answer and seek inclusion in ${o.topDomain?.[0]||'the sources models already use'}.`}else{strategy='Direct answer content';action=`No brand owns most of these answers. Create a concise page section that answers the question directly, with current numbers, a table and FAQ markup.`}return`<article class="card plan-item"><div class="priority">${i+1}</div><div class="plan-query">${esc(o.query)}<span>${esc(o.topic.replaceAll('_',' '))} · ${esc(o.funnel)} · ${o.miss}/${o.runs} answers missed Acme</span></div><div class="plan-signal"><span class="strategy">${esc(strategy)}</span><b>${o.topBrand?`${esc(o.topBrand[0])} wins ${o.topBrand[1]}×`:`${o.open} open answers`}</b>${o.topDomain?`Top source: ${esc(o.topDomain[0])}`:'No dominant external source'}</div><div class="plan-action"><b>What Acme should do</b>${esc(action)}</div></article>`}).join('');
+    const ahead=ownIndex>0?brands.slice(0,ownIndex):[];
+    const gapRows=ahead.map((comp,index)=>{const prompts={},topics={},domains={},models={},evidence=[];let wins=0,headToHead=0;for(const r of neutral){for(const s of (r.samples||[])){const bs=s.brands||[],ci=bs.indexOf(comp.brand),ei=bs.indexOf('Acme');if(ci>=0&&ei<0){wins++;prompts[r.query]=(prompts[r.query]||0)+1;const topic=r.topic||r.funnel||'other';topics[topic]=(topics[topic]||0)+1;models[r.engine]=(models[r.engine]||0)+1;for(const d of new Set(s.domains||[]))domains[d]=(domains[d]||0)+1;if(evidence.length<2&&(s.answer_excerpt||r.answer_excerpt))evidence.push(s.answer_excerpt||r.answer_excerpt)}else if(ci>=0&&ei>=0&&ci<ei)headToHead++}}const top=(o,n=3)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);return{brand:comp.brand,rank:index+1,visibility:samples.length?comp.hits/samples.length:0,wins,headToHead,prompts:top(prompts,3),topics:top(topics,3),domains:top(domains,5),models:top(models,5),evidence}});
+    const uniqueMisses=new Set();for(const r of neutral)for(const [i,s] of (r.samples||[]).entries())if(!(s.brands||[]).includes('Acme')&&(s.brands||[]).some(b=>ahead.some(a=>a.brand===b)))uniqueMisses.add(`${r.engine}|${r.query}|${i}`);
+    $('geo-gap-total').innerHTML=`${uniqueMisses.size}<span>missed answers</span>`;
+    $('geo-gap-summary').textContent=gapRows.length?`${gapRows[0].brand} creates the largest gap; the main opportunity is to win the questions where Acme disappears entirely.`:'Acme leads the latest neutral panel.';
+    $('geo-gap-body').innerHTML=gapRows.length?gapRows.map(g=>{
+      const prompt=g.prompts[0]?.[0]||'No single question dominates',topic=g.topics[0]?.[0]?.replaceAll('_',' ')||'mixed topics';
+      const external=g.domains.find(x=>!/(^|\.)acme\.(com|it|de)$/i.test(x[0]));
+      const sources=g.domains.length?g.domains.slice(0,3).map(([d,n])=>`<span>${esc(d)} · ${n}×</span>`).join(''):'<span>No citation returned</span>';
+      const action=external?`Study ${external[0]} and create a stronger Acme answer for this exact question.`:'Create a stronger Acme answer for this exact question.';
+      return `<article class="card gap-card"><div class="gap-top"><div><div class="gap-name">${esc(g.brand)}</div><div class="sub">${g.wins} answers named ${esc(g.brand)} but omitted Acme${g.headToHead?` · ${g.headToHead} more ranked it first`:''}</div></div><span class="gap-rank">#${g.rank}</span></div>`+
+        `<div class="compare"><div class="compare-row"><span>${esc(g.brand)}</span><div class="track"><div class="fill" style="width:${Math.min(100,g.visibility*100)}%"></div></div><b>${pct(g.visibility)}</b></div><div class="compare-row"><span>Acme</span><div class="track"><div class="fill acme" style="width:${Math.min(100,(own?.hits||0)/samples.length*100)}%"></div></div><b>${samples.length?pct((own?.hits||0)/samples.length):'—'}</b></div></div>`+
+        `<div class="gap-fact"><b>Biggest gap: ${esc(topic)}</b><span>“${esc(prompt)}”</span></div><div class="label">Sources repeatedly used in those answers</div><div class="source-chips">${sources}</div><div class="next-step"><b>Recommended next step:</b> ${esc(action)}</div>`+
+        `<details class="diagnostic"><summary>See the evidence behind this diagnosis</summary><div class="diag-grid"><div><div class="diag-title">Questions where they win</div><ol class="diag-list">${g.prompts.map(([q,n])=>`<li>${esc(q)} <span class="sub">(${n} answers)</span></li>`).join('')}</ol><div class="diag-title">Topic concentration</div><ul class="diag-list">${g.topics.map(([t,n])=>`<li>${esc(t.replaceAll('_',' '))}: ${n} missed answers</li>`).join('')}</ul></div><div><div class="diag-title">Which models create the gap</div><div class="model-bars">${g.models.map(([m,n])=>`<div class="model-line"><span>${esc(names[m]||m)}</span><div class="track"><div class="fill" style="width:${g.wins?100*n/g.wins:0}%"></div></div><b>${n}</b></div>`).join('')}</div><div class="diag-title" style="margin-top:12px">All repeated sources</div><div class="source-chips">${g.domains.map(([d,n])=>`<span>${esc(d)} · ${n}×</span>`).join('')}</div></div></div>${g.evidence[0]?`<div class="evidence">Example answer evidence: “${esc(g.evidence[0])}”</div>`:''}</details></article>`;
+    }).join(''):'<div class="card gap-card">No competitor is ahead of Acme in the latest neutral panel.</div>';
+    const head='<tr><th>Prompt</th>'+engines.map(e=>`<th>${esc(names[e]||e)}</th>`).join('')+'</tr>';$('probe-matrix-head').innerHTML=head;
+    $('probe-matrix-body').innerHTML=queries.map(q=>`<tr><td>${esc(q)}</td>`+engines.map(e=>{const r=rows.find(x=>x.query===q&&x.engine===e);if(!r)return'<td>—</td>';const rate=r.runs?r.appeared/r.runs:0;return`<td class="${rate?'hit':'miss'}">${r.appeared}/${r.runs}${r.rank_mean?` · #${r.rank_mean}`:''}</td>`}).join('')+'</tr>').join('');
+    $('probe-meta').textContent=`Latest run ${run.date||'—'} · ${queries.length} prompts · ${engines.length} providers · repeated samples`;
+    const byEngine=engines.map(e=>{const rs=neutral.filter(r=>r.engine===e),runs=sum(rs,'runs'),hits=sum(rs,'appeared'),ranks=rs.flatMap(r=>r.rank_samples||[]),cites=rs.reduce((a,r)=>a+Math.round((r.cited_rate||0)*(r.runs||0)),0);return{e,runs,hits,ranks,cites}});
+    $('probe-engine-body').innerHTML=byEngine.map(x=>`<tr><td>${esc(names[x.e]||x.e)}</td><td>${x.runs}</td><td>${x.hits}</td><td>${x.runs?pct(x.hits/x.runs):'—'}</td><td>${x.ranks.length?(x.ranks.reduce((a,n)=>a+n,0)/x.ranks.length).toFixed(1):'—'}</td><td>${x.runs?pct(x.cites/x.runs):'—'}</td></tr>`).join('');
+    const domains={};for(const r of rows)for(const s of (r.samples||[]))for(const d of new Set(s.domains||[]))domains[d]=(domains[d]||0)+1;const ds=Object.entries(domains).sort((a,b)=>b[1]-a[1]).slice(0,15),dc=Object.values(domains).reduce((a,n)=>a+n,0);
+    $('probe-source-body').innerHTML=ds.length?ds.map(([d,n])=>`<tr><td>${esc(d)}</td><td>${n}</td><td>${pct(n/dc)}</td></tr>`).join(''):'<tr><td colspan="3">No citation domains returned.</td></tr>';
+  }
+  function renderDemand(){
+    if(!K||!Array.isArray(K.top_queries))return;
+    const rows=(K.top_question_queries?.length?K.top_question_queries:K.top_queries).slice(0,15);
+    const total=rows.reduce((a,r)=>a+(r.avg_monthly_searches||0),0);
+    $('demand-summary').textContent=`${rows.length} high-demand Italian question patterns · ${fmt(total)} combined average monthly searches`;
+    $('demand-note').textContent=`Source: ${K.source}. These volumes rank topics; they are not chatbot prompt counts.`;
+    $('demand-date').textContent=(K.generated_at||'').slice(0,10);
+    $('demand-body').innerHTML=rows.map(r=>`<tr><td>${esc(r.query)}</td><td>${fmt(r.avg_monthly_searches)}</td><td>${esc((r.competition||'—').replaceAll('_',' ').toLowerCase())}</td><td>${r.question_like?'Yes':'No'}</td></tr>`).join('');
+  }
+  function renderAdhoc(doc, isLatest=false){
+    if(!doc||!Array.isArray(doc.results))return;
+    $('ask-input').value=doc.question||'';
+    $('ask-status').textContent=`${isLatest?'New answers received':'Last live question'} · ${doc.generated_at||''} · ${doc.results.length} models`;
+    $('ask-answers').innerHTML=doc.results.map(r=>{
+      const label=names[r.engine]||r.engine,mentioned=r.brand_mentioned;
+      if(r.error)return`<article class="answer"><div class="answer-head"><h3>${esc(label)}</h3><span class="answer-flag">ERROR</span></div><p class="sub">${esc(r.error)}</p></article>`;
+      const competitors=(r.competitors||[]).length?`<div class="sub">Also mentioned: ${esc(r.competitors.join(', '))}</div>`:'';
+      const links=(r.urls||[]).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join('');
+      return`<article class="answer"><div class="answer-head"><h3>${esc(label)}</h3><span class="answer-flag ${mentioned?'yes':''}">${mentioned?`ACME #${r.brand_rank||'?'}`:'ACME ABSENT'}</span></div>${competitors}<div class="answer-text">${esc(r.answer_text||'')}</div><details><summary>${(r.urls||[]).length} cited sources</summary>${links||'<div class="sub">No sources returned</div>'}</details></article>`;
+    }).join('');
+  }
+  function renderAnalyst(doc,isLatest=false){
+    if(!doc||!doc.answer)return;$('analyst-input').value=doc.question||'';$('analyst-status').textContent=`${isLatest?'New analysis':'Last analysis'} · ${doc.model||'Claude'} · ${doc.web_search_used?'web research used':'dashboard data only'}`;
+    const sources=(doc.sources||[]).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.domain||s.url)}</a>`).join('');
+    $('analyst-result').innerHTML=`<div class="analyst-answer">${esc(doc.answer)}</div>${sources?`<div class="analyst-sources">${sources}</div>`:''}`;if(isLatest)openAnalyst();
+  }
+  document.querySelectorAll('.analyst-hints button').forEach(b=>b.addEventListener('click',()=>{$('analyst-input').value=b.textContent;$('analyst-input').focus()}));
+  let analystTimer=null;$('analyst-form').addEventListener('submit',ev=>{ev.preventDefault();const q=$('analyst-input').value.trim();if(!q)return;const btn=$('analyst-submit'),before=window.ANALYST_LIVE_DATA?.generated_at||'';btn.disabled=true;$('analyst-status').textContent='Claude is reading the dashboard and researching the web if needed…';$('analyst-result').innerHTML='';location.href='acme-refresh://analyst/?q='+encodeURIComponent(q);let tries=0;clearInterval(analystTimer);analystTimer=setInterval(()=>{tries++;document.getElementById('analyst-reload')?.remove();const s=document.createElement('script');s.id='analyst-reload';s.src='analyst_data.js?t='+Date.now();s.onload=()=>{const d=window.ANALYST_LIVE_DATA;if(d&&d.generated_at!==before&&d.question===q){clearInterval(analystTimer);btn.disabled=false;renderAnalyst(d,true)}};document.head.appendChild(s);if(tries>=120){clearInterval(analystTimer);btn.disabled=false;$('analyst-status').textContent='No answer after 10 minutes. Check logs/refresh.log.'}},5000)});
+  let adhocTimer=null;
+  $('ask-form').addEventListener('submit',ev=>{
+    ev.preventDefault();const q=$('ask-input').value.trim();if(!q)return;
+    const btn=$('ask-submit'),before=window.ADHOC_LIVE_DATA?.generated_at||'';btn.disabled=true;$('ask-status').textContent='Opening PowerShell and asking all models… usually 1–3 minutes.';$('ask-answers').innerHTML='';
+    location.href='acme-refresh://adhoc/?q='+encodeURIComponent(q);
+    let tries=0;clearInterval(adhocTimer);adhocTimer=setInterval(()=>{
+      tries++;const old=document.getElementById('adhoc-reload');if(old)old.remove();const sc=document.createElement('script');sc.id='adhoc-reload';sc.src='adhoc_data.js?t='+Date.now();sc.onload=()=>{const d=window.ADHOC_LIVE_DATA;if(d&&d.generated_at!==before&&d.question===q){clearInterval(adhocTimer);btn.disabled=false;renderAdhoc(d,true)}};document.head.appendChild(sc);
+      if(tries>=90){clearInterval(adhocTimer);btn.disabled=false;$('ask-status').textContent='No new answers after 7.5 minutes. Check logs/refresh.log, then reopen the dashboard.'}
+    },5000);
+  });
+  function renderCharts(rows){
+    charts.forEach(c=>c.destroy());charts=[];if(typeof Chart==='undefined')return;
+    const weeks={},engines=new Set();for(const r of rows){const w=monday(r.date),x=weeks[w]||(weeks[w]={leads:0,total:0,by:{}});x.total+=r.sessions||0;x.leads+=(r.leads??r.conversions??0);x.by[r.engine]=(x.by[r.engine]||0)+(r.sessions||0);engines.add(r.engine)}
+    const labels=Object.keys(weeks).sort(),es=[...engines].sort((a,b)=>rows.filter(x=>x.engine===b).reduce((s,x)=>s+x.sessions,0)-rows.filter(x=>x.engine===a).reduce((s,x)=>s+x.sessions,0));
+    const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10,color:'#627168'}}},scales:{x:{grid:{display:false},ticks:{color:'#718078'}},y:{beginAtZero:true,grid:{color:'#e8ede8'},ticks:{color:'#718078'}}}};
+    charts.push(new Chart($('visits-chart'),{type:'bar',data:{labels,datasets:es.map(e=>({label:names[e]||e,data:labels.map(w=>weeks[w].by[e]||0),backgroundColor:colors[e]||'#809087'}))},options:{...common,scales:{x:{...common.scales.x,stacked:true},y:{...common.scales.y,stacked:true}}}}));
+    charts.push(new Chart($('outcome-chart'),{type:'line',data:{labels,datasets:[{label:'Visits',data:labels.map(w=>weeks[w].total),borderColor:'#08783e',backgroundColor:'rgba(8,120,62,.10)',fill:true,tension:.25,yAxisID:'y'},{label:'GA4 lead events',data:labels.map(w=>weeks[w].leads),borderColor:'#c3423b',backgroundColor:'#c3423b',tension:.25,yAxisID:'y1'}]},options:{...common,scales:{x:common.scales.x,y:common.scales.y,y1:{beginAtZero:true,position:'right',grid:{display:false},ticks:{color:'#c3423b',precision:0}}}}}));
+  }
+  $('presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const n=+b.dataset.days;range={start:shift(max,-n+1)<min?min:shift(max,-n+1),end:max};$('start').value=range.start;$('end').value=range.end;[...$('presets').children].forEach(x=>x.classList.toggle('active',x===b));render()});
+  for(const id of ['start','end'])$(id).addEventListener('change',()=>{range={start:$('start').value,end:$('end').value};[...$('presets').children].forEach(x=>x.classList.remove('active'));render()});
+  $('footer').textContent=`Source: GA4 property ${D.property_id||'—'} · Data generated ${D.generated_at||'—'} · Latest observed AI referral date ${max}. “Lead” is a slider-success event count and is not deduplicated against CRM records.`;
+  let refreshPoll=null,refreshClock=null;
+  function stamp(x){return x?.generated_at||x?.runs?.at(-1)?.date||''}
+  function loadFreshScript(src,id){return new Promise(resolve=>{document.getElementById(id)?.remove();const s=document.createElement('script');s.id=id;s.src=src+'?t='+Date.now();s.onload=()=>resolve(true);s.onerror=()=>resolve(false);document.head.appendChild(s)})}
+  function setRefreshStep(id,state){const el=$(id);el.className='refresh-step '+state;el.querySelector('.step-icon').textContent=state==='done'?'✓':id.endsWith('ga4')?'1':id.endsWith('demand')?'2':'3';el.lastElementChild.textContent=state==='done'?'Updated':state==='running'?'Running…':'Waiting'}
+  $('refresh').addEventListener('click',()=>{
+    const active=document.querySelector('#nav button.active')?.dataset.target||'overview';
+    const mode=active==='traffic'?'ga4':active==='probes'?'geo':'all';
+    const required=mode==='ga4'?['ga4']:mode==='geo'?['geo']:['ga4','demand','geo'];
+    const before={ga4:stamp(window.GA4_LIVE_DATA),demand:stamp(window.KEYWORD_DEMAND_DATA),geo:stamp(window.GEO_LIVE_DATA)},started=Date.now();
+    const copy={ga4:['Refreshing traffic & leads','Usually 1–3 minutes while GA4 traffic and lead-event data is fetched.'],geo:['Refreshing model tests','Usually 5–10 minutes because all 55 questions are asked across ChatGPT, Claude and Gemini and every fresh answer is analysed.'],all:['Refreshing overview','Usually 5–10 minutes while GA4, Google demand and all 55 model-test questions are refreshed.']};
+    $('refresh-title').textContent=copy[mode][0];$('refresh-explain').textContent=copy[mode][1]+' Keep this tab open; it will reload automatically.';
+    for(const key of ['ga4','demand','geo'])$('refresh-step-'+key).hidden=!required.includes(key);
+    $('refresh-warning').textContent=mode==='geo'||mode==='all'?'The model test collects new answers rather than reusing cached scores.':'Only the Traffic & leads data is being refreshed.';
+    $('refresh').disabled=true;$('refresh-status').textContent='Refresh running';$('refresh-lock').hidden=false;document.body.style.overflow='hidden';setRefreshStep('refresh-step-'+required[0],'running');
+    const tickClock=()=>{const sec=Math.floor((Date.now()-started)/1000),min=Math.floor(sec/60);$('refresh-elapsed').textContent=`Elapsed ${String(min).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;if(sec>45&&required.every(k=>stamp(k==='ga4'?window.GA4_LIVE_DATA:k==='demand'?window.KEYWORD_DEMAND_DATA:window.GEO_LIVE_DATA)===before[k]))$('refresh-warning').textContent='The refresh helper may be waiting for PowerShell. Check the taskbar if Windows opened a protocol confirmation.';else if(sec>180&&(mode==='geo'||mode==='all'))$('refresh-warning').textContent='The model tests are collecting fresh answers in parallel. This page is still checking automatically.'};
+    refreshClock=setInterval(tickClock,1000);tickClock();location.href='acme-refresh://'+mode;
+    const poll=async()=>{if(required.includes('ga4'))await loadFreshScript('ai_traffic_data.js','refresh-ga4-data');if(required.includes('demand'))await loadFreshScript('keyword_demand_data.js','refresh-demand-data');if(required.includes('geo'))await loadFreshScript('geo_data.js','refresh-geo-data');const done={ga4:stamp(window.GA4_LIVE_DATA)!==before.ga4,demand:stamp(window.KEYWORD_DEMAND_DATA)!==before.demand,geo:stamp(window.GEO_LIVE_DATA)!==before.geo};let prior=true;for(const key of required){setRefreshStep('refresh-step-'+key,done[key]?'done':prior?'running':'');prior=prior&&done[key]}const n=required.filter(k=>done[k]).length,total=required.length;$('refresh-progress-bar').style.width=`${Math.max(4,n/total*100)}%`;$('refresh-count').textContent=`${n} of ${total} completed`;if(n===total){clearInterval(refreshPoll);clearInterval(refreshClock);$('refresh-warning').textContent='Complete. Loading the fresh page…';setTimeout(()=>location.reload(),1200)}};
+    refreshPoll=setInterval(poll,10000);setTimeout(poll,3000);
+  });
+  $('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('[data-tab]').forEach(x=>x.hidden=x.id!==b.dataset.target);document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x===b));$('refresh').textContent='↻ '+(b.dataset.target==='traffic'?'Refresh traffic':b.dataset.target==='probes'?'Refresh model tests':'Refresh overview');window.dispatchEvent(new Event('resize'))});
+  renderGeo();renderDemand();renderOverviewTraffic();renderAdhoc(window.ADHOC_LIVE_DATA);renderAnalyst(window.ANALYST_LIVE_DATA);
+  render();
+})();
+</script>
+</body>
+</html>

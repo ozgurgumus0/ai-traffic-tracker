@@ -1,0 +1,15 @@
+# GA4 layer
+google-analytics-data
+python-dotenv
+# GEO monitor layer
+requests
+openai
+anthropic
+google-genai
+google-ads>=24.0.0  # Google Keyword Planner demand layer
+google-api-python-client  # Search Console query layer
+gspread          # ad-hoc capture + Peec weekly -> Google Sheet
+openpyxl         # batch_probe.py reads the probing-capture template
+# Peec AI layer (peec_client.py / peec_pull.py) uses only `requests` (above)
+beautifulsoup4   # citation_analysis.py page scraper (Q3)
+lxml             # parser backend for beautifulsoup4

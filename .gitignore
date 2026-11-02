@@ -1,0 +1,42 @@
+# Secrets and private config (copy config.example.json -> config.json)
+.env
+.env.*
+!.env.example
+config.json
+data/service-account-key.json
+data/sheets_service_account.json
+*service_account*.json
+
+# Generated data (scripts recreate these)
+data/
+ai_traffic_data.js
+geo_results.json
+geo_data.js
+adhoc_results.json
+adhoc_data.js
+analyst_data.js
+peec_data.js
+citation_data.js
+keyword_demand_data.js
+search_console_data.js
+aio_data.js
+AI_Monitor_snapshot_*.html
+
+# Reports, logs and scratch
+geo-fix/
+output/
+tmp/
+logs/
+*.pdf
+*.log
+*.xlsx
+
+# Python / editors / OS
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
